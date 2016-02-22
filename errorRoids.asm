@@ -2,7 +2,7 @@
 ;A simple action shooter
 ;Windows32 Application 
 
-
+;Include files from Irvine libraries found in the ..\Irvine folder
 INCLUDE Irvine32.inc
 INCLUDE GraphWin.inc
 
