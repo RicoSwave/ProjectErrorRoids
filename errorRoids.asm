@@ -22,6 +22,7 @@ GreetText  BYTE "This window is shown immediately after "
 	       BYTE "CreateWindow and UpdateWindow are called.",0
 
 CloseMsg   BYTE "WM_CLOSE message received",0
+KeyMsg     BYTE "WM_KEYDOWN message received",0
 
 ErrorTitle  BYTE "Error",0
 WindowName  BYTE "ASM Windows App",0
@@ -120,11 +121,10 @@ WinProc PROC,
 	    ADDR WindowName, MB_OK
 	  INVOKE PostQuitMessage,0
 	  jmp WinProcExit
-	;.ELSEIF eax == WM_KEYDOWN     ; keyboard controls?
-	;  INVOKE MessageBox, hWnd, ADDR CloseMsg,
-	;    ADDR WindowName, MB_OK
-	;  INVOKE PostQuitMessage,0
-	; jmp WinProcExit
+	.ELSEIF eax == WM_KEYDOWN     ; keyboard controls
+	  INVOKE MessageBox, hWnd, ADDR KeyMsg,
+	    ADDR WindowName, MB_OK
+	 jmp WinProcExit
 	.ELSE		; other message?
 	  INVOKE DefWindowProc, hWnd, localMsg, wParam, lParam
 	  jmp WinProcExit
