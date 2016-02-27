@@ -23,6 +23,10 @@ GreetText  BYTE "This window is shown immediately after "
 
 CloseMsg   BYTE "WM_CLOSE message received",0
 KeyMsg     BYTE "WM_KEYDOWN message received",0
+UpKeyMsg   BYTE "VK_UP message recieved",0
+DownKeyMsg   BYTE "VK_DOWN message recieved",0
+LeftKeyMsg   BYTE "VK_LEFT message recieved",0
+RightKeyMsg   BYTE "VK_RIGHT message recieved",0
 
 ErrorTitle  BYTE "Error",0
 WindowName  BYTE "ASM Windows App",0
@@ -122,8 +126,37 @@ WinProc PROC,
 	  INVOKE PostQuitMessage,0
 	  jmp WinProcExit
 	.ELSEIF eax == WM_KEYDOWN     ; keyboard controls
-	  INVOKE MessageBox, hWnd, ADDR KeyMsg,
+	  ;jump table to find virtual key from wparam
+	  mov eax,wparam
+	  cmp eax,VK_UP
+	  je UpKey
+	  cmp eax,VK_DOWN
+	  je DownKey
+	  cmp eax,VK_LEFT
+	  je LeftKey
+	  cmp eax,VK_RIGHT
+	  je RightKey
+	  jmp Default
+	  UpKey:
+	   INVOKE MessageBox, hWnd, ADDR UpKeyMsg,
 	    ADDR WindowName, MB_OK
+	    jmp keydownExit
+       DownKey:
+	   INVOKE MessageBox, hWnd, ADDR DownKeyMsg,
+	    ADDR WindowName, MB_OK
+	    jmp keydownExit
+	  LeftKey:
+	   INVOKE MessageBox, hWnd, ADDR LeftKeyMsg,
+	    ADDR WindowName, MB_OK
+	    jmp keydownExit
+	  RightKey:
+	   INVOKE MessageBox, hWnd, ADDR RightKeyMsg,
+	    ADDR WindowName, MB_OK
+	    jmp keydownExit
+       Default:
+	   INVOKE MessageBox, hWnd, ADDR KeyMsg,
+	    ADDR WindowName, MB_OK
+      keydownExit:
 	 jmp WinProcExit
 	.ELSE		; other message?
 	  INVOKE DefWindowProc, hWnd, localMsg, wParam, lParam
