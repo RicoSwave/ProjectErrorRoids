@@ -8,29 +8,24 @@ INCLUDE GraphWin.inc
 
 ;==================== DATA =======================
 .data
+shipLocX dword 50	;X coordinate of the ship
+shipLocY dword 50   ;Y coordinate of the ship
+shotsFired DWORD 0  ;number of shots fired
+shipPlaceholder BYTE "XXXXXX",0
 
-AppLoadMsgTitle BYTE "Application Loaded",0
-AppLoadMsgText  BYTE "This window displays when the WM_CREATE "
-	            BYTE "message is received",0
+PopupTitle BYTE "Weapon Fired!",0
+PopupText  BYTE "PEW! "
+	       BYTE "PEW!",0
 
-PopupTitle BYTE "Popup Window",0
-PopupText  BYTE "This window was activated by a "
-	       BYTE "WM_LBUTTONDOWN message",0
+GreetTitle BYTE "ErrorRoids!",0
+GreetText  BYTE "Welcome to ErrorRoids! "
+	       BYTE "Press OK to begin. ",0
 
-GreetTitle BYTE "Main Window Active",0
-GreetText  BYTE "This window is shown immediately after "
-	       BYTE "CreateWindow and UpdateWindow are called.",0
-
-CloseMsg   BYTE "WM_CLOSE message received",0
-KeyMsg     BYTE "WM_KEYDOWN message received",0
-UpKeyMsg   BYTE "VK_UP message recieved",0
-DownKeyMsg   BYTE "VK_DOWN message recieved",0
-LeftKeyMsg   BYTE "VK_LEFT message recieved",0
-RightKeyMsg   BYTE "VK_RIGHT message recieved",0
+CloseMsg   BYTE "Thank you for playing!",0
 
 ErrorTitle  BYTE "Error",0
-WindowName  BYTE "ASM Windows App",0
-className   BYTE "ASMWin",0
+WindowName  BYTE "ErrorRoids!",0
+className   BYTE "ErrorRoids ASMWin",0
 
 ; Define the Application's Window class structure.
 MainWin WNDCLASS <NULL,WinProc,NULL,NULL,NULL,NULL,NULL, \
@@ -89,6 +84,8 @@ Message_Loop:
 	; Get next message from the queue.
 	INVOKE GetMessage, ADDR msg, NULL,NULL,NULL
 
+	;INVOKE Paint, hMainWnd, shipLocX, shipLocY, ADDR shipPlaceholder
+
 	; Quit if no more messages.
 	.IF eax == 0
 	  jmp Exit_Program
@@ -99,6 +96,17 @@ Message_Loop:
     jmp Message_Loop
 
 Exit_Program:
+       ;debug out
+       mov eax,shipLocX
+	  Call WriteDec
+	  Call CRLF
+	  MOV eax,shipLocY
+	  Call WriteDec
+	  Call CRLF
+	  MOV eax,shotsFired
+	  call WriteDec
+	  Call CRLF
+
 	  INVOKE ExitProcess,0
 WinMain ENDP
 
@@ -115,10 +123,10 @@ WinProc PROC,
 	.IF eax == WM_LBUTTONDOWN		; mouse button?
 	  INVOKE MessageBox, hWnd, ADDR PopupText,
 	    ADDR PopupTitle, MB_OK
+	  inc shotsFired			;increase shots fired
 	  jmp WinProcExit
 	.ELSEIF eax == WM_CREATE		; create window?
-	  INVOKE MessageBox, hWnd, ADDR AppLoadMsgText,
-	    ADDR AppLoadMsgTitle, MB_OK
+	  
 	  jmp WinProcExit
 	.ELSEIF eax == WM_CLOSE		; close window?
 	  INVOKE MessageBox, hWnd, ADDR CloseMsg,
@@ -128,34 +136,30 @@ WinProc PROC,
 	.ELSEIF eax == WM_KEYDOWN     ; keyboard controls
 	  ;jump table to find virtual key from wparam
 	  mov eax,wparam
-	  cmp eax,VK_UP
+	  cmp eax,VK_UP			;up arrow
 	  je UpKey
-	  cmp eax,VK_DOWN
+	  cmp eax,VK_DOWN			;down arrow
 	  je DownKey
-	  cmp eax,VK_LEFT
+	  cmp eax,VK_LEFT			;left arrow
 	  je LeftKey
-	  cmp eax,VK_RIGHT
+	  cmp eax,VK_RIGHT			;right arrow
 	  je RightKey
 	  jmp Default
+	  ; Ship movement - 3 pixels per press
+	  ; Upper left corner of window is (0,0) Starting point of the ship is (50,50)
 	  UpKey:
-	   INVOKE MessageBox, hWnd, ADDR UpKeyMsg,
-	    ADDR WindowName, MB_OK
+	    sub shipLocX,3
 	    jmp keydownExit
        DownKey:
-	   INVOKE MessageBox, hWnd, ADDR DownKeyMsg,
-	    ADDR WindowName, MB_OK
+	    add shipLocX,3
 	    jmp keydownExit
 	  LeftKey:
-	   INVOKE MessageBox, hWnd, ADDR LeftKeyMsg,
-	    ADDR WindowName, MB_OK
+	    sub shipLocY,3
 	    jmp keydownExit
 	  RightKey:
-	   INVOKE MessageBox, hWnd, ADDR RightKeyMsg,
-	    ADDR WindowName, MB_OK
+	    add shipLocY,3
 	    jmp keydownExit
        Default:
-	   INVOKE MessageBox, hWnd, ADDR KeyMsg,
-	    ADDR WindowName, MB_OK
       keydownExit:
 	 jmp WinProcExit
 	.ELSE		; other message?
@@ -191,5 +195,11 @@ messageID  DWORD ?
 	INVOKE LocalFree, pErrorMsg
 	ret
 ErrorHandler ENDP
+
+;Paint PROC,
+;	hWnd:DWORD, xCoord:DWORD, yCoord:DWORD, toDraw:PTR BYTE
+
+;	ret
+;Paint endP
 
 END WinMain
