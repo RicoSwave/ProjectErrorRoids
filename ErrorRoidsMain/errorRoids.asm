@@ -14,7 +14,9 @@ shipLocY DWORD 50		; Y coordinate of the ship
 shipHeading DWORD 90	; Heading of the ship
 shipAccel DWORD 0		; acceleration of the ship due to thrust
 shotsFired DWORD 0		; number of shots fired
+timer DWORD 0			; game timer
 shipPlaceholder BYTE "V",0
+errorRoid BYTE "FOR (int y = 0, y > y, y++)(while 0 == 0)", "{ int y:= 0", "/n",0
 
 ; Player Values
 playerScore DWORD 0		; player score
@@ -64,7 +66,7 @@ hInstance DWORD ?
 
 ;-----------------------------------------------------
 ConsoleMessage MACRO N
-; Macro which writes a string to console.
+; Macro which writes a complete string to console.
 ;-----------------------------------------------------
 local L
 
@@ -164,11 +166,12 @@ Main_Loop:
 	cmp shipAccel,1
 	je AccelTrue
 	AccelDone:
-	;-------ACCEL-----------------
+	;-------/ACCEL----------------
     
     ;-----BOUNDS------------------
-    ; Ship bounds checking
     ; TODO: bounds checking & wrapping for other objects
+
+    ; Ship bounds checking
     cmp shipLocX,0		; Check for leaving X lower bound
     jae XinBoundA
     mov shipLocX,500	; Wrap on X border
@@ -189,8 +192,19 @@ Main_Loop:
     mov shipLocY,0		; Wrap on Y border
     YinBoundB:
 
-    ;-----BOUNDS------------------
+    cmp shipHeading,360
+    jge OverH
+    cmp shipHeading,0
+    jl UnderH
+    OverH:
+    sub shipHeading,360
+    jmp MessageCheck
+    UnderH:
+    add shipHeading,360
 
+    ;-----/BOUNDS-----------------
+
+     MessageCheck:
 	; Relay the message to the program's WinProc.
 	INVOKE DispatchMessage, ADDR msg
 	jmp Main_Loop
@@ -225,7 +239,7 @@ Exit_Program:
 
 	  ConsoleMessage sHeading
 	  MOV eax,shipHeading
-	  call WriteDec
+	  call WriteInt
 	  call CRLF
 
 	  ConsoleMessage gameOverMessage
@@ -282,10 +296,10 @@ WinProc PROC,
 	    mov shipAccel,0		; turn off thrusters
 	    jmp keydownExit
 	  LeftKey:
-	    sub shipHeading,20	; Decrease Heading by 20 degrees
+	    sub shipHeading,45	; Decrease Heading by 45 degrees
 	    jmp keydownExit
 	  RightKey:
-	    add shipHeading,20	; Increase Heading by 20 degrees
+	    add shipHeading,45	; Increase Heading by 45 degrees
 	    jmp keydownExit
 	  SpaceKey:
 	    XOR shipAccel,1		; Toggle thrusters
