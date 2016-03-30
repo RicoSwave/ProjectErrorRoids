@@ -14,7 +14,7 @@ shipLocY DWORD 50		; Y coordinate of the ship
 shipHeading DWORD 90	; Heading of the ship
 shipAccel DWORD 0		; acceleration of the ship due to thrust
 shotsFired DWORD 0		; number of shots fired
-timer DWORD 0			; game timer
+gameTimer DWORD 0			; game timer
 shipPlaceholder BYTE "V",0
 errorRoid BYTE "FOR (int y = 0, y > y, y++)(while 0 == 0)", "{ int y:= 0", "/n",0
 
@@ -47,6 +47,7 @@ score BYTE "Player Score: ",0
 sAccel BYTE "Ship Acceleration: ",0
 pLives BYTE "Player Lives: ",0
 sHeading BYTE "Ship heading: ",0
+displayTimer BYTE "Game time: ",0
 
 ; Window Pane Strings
 ErrorTitle  BYTE "Error",0
@@ -149,7 +150,7 @@ WinMain PROC
 
 ; Begin the program's message-handling loop.
 Main_Loop:
-	; Get next message from the queue.
+     ; Get next message from the queue.
 	INVOKE GetMessage, ADDR msg, NULL,NULL,NULL
 
 	; Quit if no more messages.
@@ -157,7 +158,8 @@ Main_Loop:
 	  jmp Exit_Program
 	.ENDIF
 
-	; TODO: Implement Draw Playfield
+
+	; TODO: Implement Draw Playfield, probably with a C callback program
 
 	; TODO: Implement Decrease object acceleration due to inertia
 
@@ -204,13 +206,20 @@ Main_Loop:
 
     ;-----/BOUNDS-----------------
 
+     inc gameTimer;
+	add playerScore,5
+	nop
+	nop
+
+
+
      MessageCheck:
 	; Relay the message to the program's WinProc.
 	INVOKE DispatchMessage, ADDR msg
 	jmp Main_Loop
 
     AccelTrue:
-     ; TODO: Ship Acceleration with respect to heading
+     ; TODO: Change to Procedure and add Ship Acceleration with respect to heading
 	inc shipLocX
      jmp AccelDone
 
@@ -242,6 +251,16 @@ Exit_Program:
 	  call WriteInt
 	  call CRLF
 
+	  ConsoleMessage score
+	  MOV eax, playerScore
+	  call WriteDec
+	  call CRLF
+
+	  ConsoleMessage displayTimer
+	  MOV eax, gameTimer
+	  call WriteDec
+	  call CRLF
+
 	  ConsoleMessage gameOverMessage
 	  call CRLF
 	  ;-----------------------------
@@ -264,8 +283,7 @@ WinProc PROC,
 	    ADDR PopupTitle, MB_OK
 	  inc shotsFired			; increase shots fired
 	  jmp WinProcExit
-	.ELSEIF eax == WM_CREATE		; create window?
-	  
+	.ELSEIF eax == WM_CREATE		; create window?	  
 	  jmp WinProcExit
 	.ELSEIF eax == WM_CLOSE		; close window?
 	  INVOKE MessageBox, hWnd, ADDR CloseMsg,

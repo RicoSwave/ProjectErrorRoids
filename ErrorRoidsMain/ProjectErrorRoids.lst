@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.00.23026.0	    03/28/16 15:23:34
+Microsoft (R) Macro Assembler Version 14.00.23026.0	    03/30/16 00:07:16
 errorRoids.asm						     Page 1 - 1
 
 
@@ -38,7 +38,7 @@ errorRoids.asm						     Page 1 - 1
  00000008 0000005A		shipHeading DWORD 90	; Heading of the ship
  0000000C 00000000		shipAccel DWORD 0		; acceleration of the ship due to thrust
  00000010 00000000		shotsFired DWORD 0		; number of shots fired
- 00000014 00000000		timer DWORD 0			; game timer
+ 00000014 00000000		gameTimer DWORD 0			; game timer
  00000018 56 00			shipPlaceholder BYTE "V",0
  0000001A 46 4F 52 20 28	errorRoid BYTE "FOR (int y = 0, y > y, y++)(while 0 == 0)", "{ int y:= 0", "/n",0
 	   69 6E 74 20 79
@@ -128,21 +128,24 @@ errorRoids.asm						     Page 1 - 1
  00000175 53 68 69 70 20	sHeading BYTE "Ship heading: ",0
 	   68 65 61 64 69
 	   6E 67 3A 20 00
+ 00000184 47 61 6D 65 20	displayTimer BYTE "Game time: ",0
+	   74 69 6D 65 3A
+	   20 00
 
 				; Window Pane Strings
- 00000184 45 72 72 6F 72	ErrorTitle  BYTE "Error",0
+ 00000190 45 72 72 6F 72	ErrorTitle  BYTE "Error",0
 	   00
- 0000018A 45 72 72 6F 72	WindowName  BYTE "ErrorRoids!",0
+ 00000196 45 72 72 6F 72	WindowName  BYTE "ErrorRoids!",0
 	   52 6F 69 64 73
 	   21 00
- 00000196 45 72 72 6F 72	className   BYTE "ErrorRoids ASMWin",0
+ 000001A2 45 72 72 6F 72	className   BYTE "ErrorRoids ASMWin",0
 	   52 6F 69 64 73
 	   20 41 53 4D 57
 	   69 6E 00
 
 				; Define the Application's Window class structure.
- 000001A8 00000000		MainWin WNDCLASS <NULL,WinProc,NULL,NULL,NULL,NULL,NULL, \
-	   00000268 R
+ 000001B4 00000000		MainWin WNDCLASS <NULL,WinProc,NULL,NULL,NULL,NULL,NULL, \
+	   000002BB R
 	   00000000
 	   00000000
 	   00000000
@@ -150,22 +153,22 @@ errorRoids.asm						     Page 1 - 1
 	   00000000
 	   00000005
 	   00000000
-	   00000196 R
+	   000001A2 R
 					COLOR_WINDOW,NULL,className>
 
- 000001D0 00000000		msg	      MSGStruct <>
+ 000001DC 00000000		msg	      MSGStruct <>
 	   00000000
 	   00000000
 	   00000000
 	   00000000
 	   00000000
 	   00000000
- 000001EC 00000000		winRect   RECT <>
+ 000001F8 00000000		winRect   RECT <>
 	   00000000
 	   00000000
 	   00000000
- 000001FC 00000000		hMainWnd  DWORD ?
- 00000200 00000000		hInstance DWORD ?
+ 00000208 00000000		hMainWnd  DWORD ?
+ 0000020C 00000000		hInstance DWORD ?
 
 				;=================== MACROS =========================
 
@@ -213,20 +216,20 @@ errorRoids.asm						     Page 1 - 1
  0000001F			WinMain PROC
 				; Get a handle to the current process.
 					INVOKE GetModuleHandle, NULL
- 00000026  A3 00000200 R		mov hInstance, eax
- 0000002B  A3 000001B8 R		mov MainWin.hInstance, eax
+ 00000026  A3 0000020C R		mov hInstance, eax
+ 0000002B  A3 000001C4 R		mov MainWin.hInstance, eax
 
 				; Load the program's icon and cursor.
 					INVOKE LoadIcon, NULL, IDI_APPLICATION
- 0000003C  A3 000001BC R		mov MainWin.hIcon, eax
+ 0000003C  A3 000001C8 R		mov MainWin.hIcon, eax
 					INVOKE LoadCursor, NULL, IDC_ARROW
- 0000004D  A3 000001C0 R		mov MainWin.hCursor, eax
+ 0000004D  A3 000001CC R		mov MainWin.hCursor, eax
 
 				; Register the window class.
 					INVOKE RegisterClass, ADDR MainWin
 					.IF eax == 0
- 00000060  E8 000002DA			  call ErrorHandler
- 00000065  E9 00000135			  jmp Exit_Program
+ 00000060  E8 0000032D			  call ErrorHandler
+ 00000065  E9 00000144			  jmp Exit_Program
 					.ENDIF
 
 				; Create the application's main window.
@@ -235,12 +238,12 @@ errorRoids.asm						     Page 1 - 1
 					  ADDR WindowName,MAIN_WINDOW_STYLE,
 					  CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,
 					  CW_USEDEFAULT,NULL,NULL,hInstance,NULL
- 000000A0  A3 000001FC R		mov hMainWnd,eax
+ 000000A0  A3 00000208 R		mov hMainWnd,eax
 
 				; If CreateWindowEx failed, display a message & exit.
 					.IF eax == 0
- 000000A9  E8 00000291			  call ErrorHandler
- 000000AE  E9 000000EC			  jmp  Exit_Program
+ 000000A9  E8 000002E4			  call ErrorHandler
+ 000000AE  E9 000000FB			  jmp  Exit_Program
 					.ENDIF
 
 				; Show and draw the window.
@@ -254,15 +257,16 @@ errorRoids.asm						     Page 1 - 1
 
 				; Begin the program's message-handling loop.
  000000E2			Main_Loop:
-					; Get next message from the queue.
+				     ; Get next message from the queue.
 					INVOKE GetMessage, ADDR msg, NULL,NULL,NULL
 
 					; Quit if no more messages.
 					.IF eax == 0
- 000000F6  E9 000000A4			  jmp Exit_Program
+ 000000F6  E9 000000B3			  jmp Exit_Program
 					.ENDIF
 
-					; TODO: Implement Draw Playfield
+
+					; TODO: Implement Draw Playfield, probably with a C callback program
 
 					; TODO: Implement Decrease object acceleration due to inertia
 
@@ -270,7 +274,7 @@ errorRoids.asm						     Page 1 - 1
 					; TODO: Test/Fix ship acceleration
  000000FB  83 3D 0000000C R		cmp shipAccel,1
 	   01
- 00000102  0F 84 0000008C		je AccelTrue
+ 00000102  0F 84 0000009B		je AccelTrue
  00000108				AccelDone:
 					;-------/ACCEL----------------
 				    
@@ -315,179 +319,208 @@ errorRoids.asm						     Page 1 - 1
  0000016F			    OverH:
  0000016F  81 2D 00000008 R	    sub shipHeading,360
 	   00000168
- 00000179  EB 0A		    jmp MessageCheck
+ 00000179  EB 19		    jmp MessageCheck
  0000017B			    UnderH:
  0000017B  81 05 00000008 R	    add shipHeading,360
 	   00000168
 
 				    ;-----/BOUNDS-----------------
 
- 00000185			     MessageCheck:
+ 00000185  FF 05 00000014 R	     inc gameTimer;
+ 0000018B  83 05 00000051 R		add playerScore,5
+	   05
+ 00000192  90				nop
+ 00000193  90				nop
+
+
+
+ 00000194			     MessageCheck:
 					; Relay the message to the program's WinProc.
 					INVOKE DispatchMessage, ADDR msg
- 0000018F  E9 FFFFFF4E			jmp Main_Loop
+ 0000019E  E9 FFFFFF3F			jmp Main_Loop
 
- 00000194			    AccelTrue:
-				     ; TODO: Ship Acceleration with respect to heading
- 00000194  FF 05 00000000 R		inc shipLocX
- 0000019A  E9 FFFFFF69		     jmp AccelDone
+ 000001A3			    AccelTrue:
+				     ; TODO: Change to Procedure and add Ship Acceleration with respect to heading
+ 000001A3  FF 05 00000000 R		inc shipLocX
+ 000001A9  E9 FFFFFF5A		     jmp AccelDone
 
- 0000019F			Exit_Program:
+ 000001AE			Exit_Program:
 					  ;-----------------------------
 				       ; Debug Messages to Console
 					  ConsoleMessage xPos
- 0000019F  52		     1		push edx
- 000001A0  33 D2	     1		xor edx,edx
- 000001A2  BA 00000125 R     1		mov edx, offset xPos
- 000001A7  E8 00000000 E     1		call WriteString
- 000001AC  E8 00000000 E     1		call CRLF
- 000001B1  5A		     1		pop edx
- 000001B2  A1 00000000 R	       mov eax,shipLocX
- 000001B7  E8 00000000 E		  Call WriteDec
- 000001BC  E8 00000000 E		  Call CRLF
+ 000001AE  52		     1		push edx
+ 000001AF  33 D2	     1		xor edx,edx
+ 000001B1  BA 00000125 R     1		mov edx, offset xPos
+ 000001B6  E8 00000000 E     1		call WriteString
+ 000001BB  E8 00000000 E     1		call CRLF
+ 000001C0  5A		     1		pop edx
+ 000001C1  A1 00000000 R	       mov eax,shipLocX
+ 000001C6  E8 00000000 E		  Call WriteDec
+ 000001CB  E8 00000000 E		  Call CRLF
 
 					  ConsoleMessage yPos
- 000001C1  52		     1		push edx
- 000001C2  33 D2	     1		xor edx,edx
- 000001C4  BA 00000134 R     1		mov edx, offset yPos
- 000001C9  E8 00000000 E     1		call WriteString
- 000001CE  E8 00000000 E     1		call CRLF
- 000001D3  5A		     1		pop edx
- 000001D4  A1 00000004 R		  MOV eax,shipLocY
- 000001D9  E8 00000000 E		  Call WriteDec
- 000001DE  E8 00000000 E		  Call CRLF
+ 000001D0  52		     1		push edx
+ 000001D1  33 D2	     1		xor edx,edx
+ 000001D3  BA 00000134 R     1		mov edx, offset yPos
+ 000001D8  E8 00000000 E     1		call WriteString
+ 000001DD  E8 00000000 E     1		call CRLF
+ 000001E2  5A		     1		pop edx
+ 000001E3  A1 00000004 R		  MOV eax,shipLocY
+ 000001E8  E8 00000000 E		  Call WriteDec
+ 000001ED  E8 00000000 E		  Call CRLF
 
 					  ConsoleMessage shots
- 000001E3  52		     1		push edx
- 000001E4  33 D2	     1		xor edx,edx
- 000001E6  BA 00000117 R     1		mov edx, offset shots
- 000001EB  E8 00000000 E     1		call WriteString
- 000001F0  E8 00000000 E     1		call CRLF
- 000001F5  5A		     1		pop edx
- 000001F6  A1 00000010 R		  MOV eax,shotsFired
- 000001FB  E8 00000000 E		  call WriteDec
- 00000200  E8 00000000 E		  call CRLF
+ 000001F2  52		     1		push edx
+ 000001F3  33 D2	     1		xor edx,edx
+ 000001F5  BA 00000117 R     1		mov edx, offset shots
+ 000001FA  E8 00000000 E     1		call WriteString
+ 000001FF  E8 00000000 E     1		call CRLF
+ 00000204  5A		     1		pop edx
+ 00000205  A1 00000010 R		  MOV eax,shotsFired
+ 0000020A  E8 00000000 E		  call WriteDec
+ 0000020F  E8 00000000 E		  call CRLF
 
 					  ConsoleMessage sAccel
- 00000205  52		     1		push edx
- 00000206  33 D2	     1		xor edx,edx
- 00000208  BA 00000152 R     1		mov edx, offset sAccel
- 0000020D  E8 00000000 E     1		call WriteString
- 00000212  E8 00000000 E     1		call CRLF
- 00000217  5A		     1		pop edx
- 00000218  A1 0000000C R		  MOV eax,shipAccel
- 0000021D  E8 00000000 E		  call WriteDec
- 00000222  E8 00000000 E		  call CRLF
+ 00000214  52		     1		push edx
+ 00000215  33 D2	     1		xor edx,edx
+ 00000217  BA 00000152 R     1		mov edx, offset sAccel
+ 0000021C  E8 00000000 E     1		call WriteString
+ 00000221  E8 00000000 E     1		call CRLF
+ 00000226  5A		     1		pop edx
+ 00000227  A1 0000000C R		  MOV eax,shipAccel
+ 0000022C  E8 00000000 E		  call WriteDec
+ 00000231  E8 00000000 E		  call CRLF
 
 					  ConsoleMessage sHeading
- 00000227  52		     1		push edx
- 00000228  33 D2	     1		xor edx,edx
- 0000022A  BA 00000175 R     1		mov edx, offset sHeading
- 0000022F  E8 00000000 E     1		call WriteString
- 00000234  E8 00000000 E     1		call CRLF
- 00000239  5A		     1		pop edx
- 0000023A  A1 00000008 R		  MOV eax,shipHeading
- 0000023F  E8 00000000 E		  call WriteInt
- 00000244  E8 00000000 E		  call CRLF
+ 00000236  52		     1		push edx
+ 00000237  33 D2	     1		xor edx,edx
+ 00000239  BA 00000175 R     1		mov edx, offset sHeading
+ 0000023E  E8 00000000 E     1		call WriteString
+ 00000243  E8 00000000 E     1		call CRLF
+ 00000248  5A		     1		pop edx
+ 00000249  A1 00000008 R		  MOV eax,shipHeading
+ 0000024E  E8 00000000 E		  call WriteInt
+ 00000253  E8 00000000 E		  call CRLF
+
+					  ConsoleMessage score
+ 00000258  52		     1		push edx
+ 00000259  33 D2	     1		xor edx,edx
+ 0000025B  BA 00000143 R     1		mov edx, offset score
+ 00000260  E8 00000000 E     1		call WriteString
+ 00000265  E8 00000000 E     1		call CRLF
+ 0000026A  5A		     1		pop edx
+ 0000026B  A1 00000051 R		  MOV eax, playerScore
+ 00000270  E8 00000000 E		  call WriteDec
+ 00000275  E8 00000000 E		  call CRLF
+
+					  ConsoleMessage displayTimer
+ 0000027A  52		     1		push edx
+ 0000027B  33 D2	     1		xor edx,edx
+ 0000027D  BA 00000184 R     1		mov edx, offset displayTimer
+ 00000282  E8 00000000 E     1		call WriteString
+ 00000287  E8 00000000 E     1		call CRLF
+ 0000028C  5A		     1		pop edx
+ 0000028D  A1 00000014 R		  MOV eax, gameTimer
+ 00000292  E8 00000000 E		  call WriteDec
+ 00000297  E8 00000000 E		  call CRLF
 
 					  ConsoleMessage gameOverMessage
- 00000249  52		     1		push edx
- 0000024A  33 D2	     1		xor edx,edx
- 0000024C  BA 000000A7 R     1		mov edx, offset gameOverMessage
- 00000251  E8 00000000 E     1		call WriteString
- 00000256  E8 00000000 E     1		call CRLF
- 0000025B  5A		     1		pop edx
- 0000025C  E8 00000000 E		  call CRLF
+ 0000029C  52		     1		push edx
+ 0000029D  33 D2	     1		xor edx,edx
+ 0000029F  BA 000000A7 R     1		mov edx, offset gameOverMessage
+ 000002A4  E8 00000000 E     1		call WriteString
+ 000002A9  E8 00000000 E     1		call CRLF
+ 000002AE  5A		     1		pop edx
+ 000002AF  E8 00000000 E		  call CRLF
 					  ;-----------------------------
 
 					  INVOKE ExitProcess,0
- 00000268			WinMain ENDP
+ 000002BB			WinMain ENDP
 
 				;-----------------------------------------------------
- 00000268			WinProc PROC,
+ 000002BB			WinProc PROC,
 					hWnd:DWORD, localMsg:DWORD, wParam:DWORD, lParam:DWORD
 				; The application's message handler, which handles
 				; application-specific messages. All other messages
 				; are forwarded to the default Windows message
 				; handler.
 				;-----------------------------------------------------
- 0000026B  8B 45 0C			mov eax, localMsg
+ 000002BE  8B 45 0C			mov eax, localMsg
 
 					.IF eax == WM_LBUTTONDOWN		; mouse button?
 					  INVOKE MessageBox, hWnd, ADDR PopupText,
 					    ADDR PopupTitle, MB_OK
- 00000289  FF 05 00000010 R		  inc shotsFired			; increase shots fired
- 0000028F  E9 000000A7			  jmp WinProcExit
-					.ELSEIF eax == WM_CREATE		; create window?
-					  
- 0000029E  E9 00000098			  jmp WinProcExit
+ 000002DC  FF 05 00000010 R		  inc shotsFired			; increase shots fired
+ 000002E2  E9 000000A7			  jmp WinProcExit
+					.ELSEIF eax == WM_CREATE		; create window?	  
+ 000002F1  E9 00000098			  jmp WinProcExit
 					.ELSEIF eax == WM_CLOSE		; close window?
 					  INVOKE MessageBox, hWnd, ADDR CloseMsg,
 					    ADDR WindowName, MB_OK
 					  INVOKE PostQuitMessage,0
- 000002C8  EB 71			  jmp WinProcExit
+ 0000031B  EB 71			  jmp WinProcExit
 					.ELSEIF eax == WM_KEYDOWN     ; TODO: Test keyboard controls
 					  ;jump table to find virtual key from wparam
- 000002D3  8B 45 10			  mov eax,wparam
- 000002D6  83 F8 26			  cmp eax,VK_UP			; up arrow
- 000002D9  74 16			  je UpKey
- 000002DB  83 F8 28			  cmp eax,VK_DOWN			; down arrow
- 000002DE  74 1D			  je DownKey
- 000002E0  83 F8 25			  cmp eax,VK_LEFT			; left arrow
- 000002E3  74 24			  je LeftKey
- 000002E5  83 F8 27			  cmp eax,VK_RIGHT			; right arrow
- 000002E8  74 28			  je RightKey
- 000002EA  83 F8 20			  cmp eax,VK_SPACE            ; space bar - toggles thrusters
- 000002ED  74 2C			  je SpaceKey
- 000002EF  EB 33			  jmp Default
+ 00000326  8B 45 10			  mov eax,wparam
+ 00000329  83 F8 26			  cmp eax,VK_UP			; up arrow
+ 0000032C  74 16			  je UpKey
+ 0000032E  83 F8 28			  cmp eax,VK_DOWN			; down arrow
+ 00000331  74 1D			  je DownKey
+ 00000333  83 F8 25			  cmp eax,VK_LEFT			; left arrow
+ 00000336  74 24			  je LeftKey
+ 00000338  83 F8 27			  cmp eax,VK_RIGHT			; right arrow
+ 0000033B  74 28			  je RightKey
+ 0000033D  83 F8 20			  cmp eax,VK_SPACE            ; space bar - toggles thrusters
+ 00000340  74 2C			  je SpaceKey
+ 00000342  EB 33			  jmp Default
 					  ; Ship movement - 3 pixels per press
 					  ; Upper left corner of window is (0,0) Starting point of the ship is (50,50)
- 000002F1				  UpKey:
- 000002F1  C7 05 0000000C R		    mov shipAccel,1		; fire thrusters
+ 00000344				  UpKey:
+ 00000344  C7 05 0000000C R		    mov shipAccel,1		; fire thrusters
 	   00000001
- 000002FB				    endUp:
- 000002FB  EB 27			    jmp keydownExit
- 000002FD			       DownKey:
- 000002FD  C7 05 0000000C R		    mov shipAccel,0		; turn off thrusters
+ 0000034E				    endUp:
+ 0000034E  EB 27			    jmp keydownExit
+ 00000350			       DownKey:
+ 00000350  C7 05 0000000C R		    mov shipAccel,0		; turn off thrusters
 	   00000000
- 00000307  EB 1B			    jmp keydownExit
- 00000309				  LeftKey:
- 00000309  83 2D 00000008 R		    sub shipHeading,45	; Decrease Heading by 45 degrees
+ 0000035A  EB 1B			    jmp keydownExit
+ 0000035C				  LeftKey:
+ 0000035C  83 2D 00000008 R		    sub shipHeading,45	; Decrease Heading by 45 degrees
 	   2D
- 00000310  EB 12			    jmp keydownExit
- 00000312				  RightKey:
- 00000312  83 05 00000008 R		    add shipHeading,45	; Increase Heading by 45 degrees
+ 00000363  EB 12			    jmp keydownExit
+ 00000365				  RightKey:
+ 00000365  83 05 00000008 R		    add shipHeading,45	; Increase Heading by 45 degrees
 	   2D
- 00000319  EB 09			    jmp keydownExit
- 0000031B				  SpaceKey:
- 0000031B  83 35 0000000C R		    XOR shipAccel,1		; Toggle thrusters
+ 0000036C  EB 09			    jmp keydownExit
+ 0000036E				  SpaceKey:
+ 0000036E  83 35 0000000C R		    XOR shipAccel,1		; Toggle thrusters
 	   01
- 00000322  EB 00			    jmp keydownExit
- 00000324			       Default:
- 00000324			      keydownExit:
- 00000324  EB 15			 jmp WinProcExit
+ 00000375  EB 00			    jmp keydownExit
+ 00000377			       Default:
+ 00000377			      keydownExit:
+ 00000377  EB 15			 jmp WinProcExit
 
 					.ELSE		; other message?
 					  INVOKE DefWindowProc, hWnd, localMsg, wParam, lParam
- 00000339  EB 00			  jmp WinProcExit
+ 0000038C  EB 00			  jmp WinProcExit
 					.ENDIF
 
- 0000033B			WinProcExit:
+ 0000038E			WinProcExit:
 					ret
 
- 0000033F			WinProc ENDP
+ 00000392			WinProc ENDP
 
 				;---------------------------------------------------
- 0000033F			ErrorHandler PROC
+ 00000392			ErrorHandler PROC
 				; Display the appropriate system error message.
 				; Used for real errors.
 				;---------------------------------------------------
- 00000204			.data
- 00000204 00000000		pErrorMsg  DWORD ?		; ptr to error message
- 00000208 00000000		messageID  DWORD ?
- 0000033F			.code
+ 00000210			.data
+ 00000210 00000000		pErrorMsg  DWORD ?		; ptr to error message
+ 00000214 00000000		messageID  DWORD ?
+ 00000392			.code
 					INVOKE GetLastError	; Returns message ID in EAX
- 00000344  A3 00000208 R		mov messageID,eax
+ 00000397  A3 00000214 R		mov messageID,eax
 
 					; Get the corresponding message string.
 					INVOKE FormatMessage, FORMAT_MESSAGE_ALLOCATE_BUFFER + \
@@ -500,11 +533,11 @@ errorRoids.asm						     Page 1 - 1
 
 					; Free the error message string.
 					INVOKE LocalFree, pErrorMsg
- 00000385  C3				ret
- 00000386			ErrorHandler ENDP
+ 000003D8  C3				ret
+ 000003D9			ErrorHandler ENDP
 
 				END WinMain
-Microsoft (R) Macro Assembler Version 14.00.23026.0	    03/28/16 15:23:34
+Microsoft (R) Macro Assembler Version 14.00.23026.0	    03/30/16 00:07:16
 errorRoids.asm						     Symbols 2 - 1
 
 
@@ -631,8 +664,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 0000020C Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000386 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000218 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000003D9 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -651,7 +684,7 @@ Delay  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 DispatchMessageA . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 DumpMem  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 DumpRegs . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-ErrorHandler . . . . . . . . . .	P Near	 0000033F _TEXT	Length= 00000047 Public STDCALL
+ErrorHandler . . . . . . . . . .	P Near	 00000392 _TEXT	Length= 00000047 Public STDCALL
 ExitProcess  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 FileTimeToDosDateTime  . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 FileTimeToSystemTime . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -741,7 +774,7 @@ Str_ucase  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 SystemTimeToFileTime . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 UpdateWindow . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WaitMsg  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-WinMain  . . . . . . . . . . . .	P Near	 0000001F _TEXT	Length= 00000249 Public STDCALL
+WinMain  . . . . . . . . . . . .	P Near	 0000001F _TEXT	Length= 0000029C Public STDCALL
   Main_Loop  . . . . . . . . . .	L Near	 000000E2 _TEXT	
   AccelDone  . . . . . . . . . .	L Near	 00000108 _TEXT	
   XinBoundA  . . . . . . . . . .	L Near	 0000011B _TEXT	
@@ -750,23 +783,23 @@ WinMain  . . . . . . . . . . . .	P Near	 0000001F _TEXT	Length= 00000249 Public 
   YinBoundB  . . . . . . . . . .	L Near	 0000015A _TEXT	
   OverH  . . . . . . . . . . . .	L Near	 0000016F _TEXT	
   UnderH . . . . . . . . . . . .	L Near	 0000017B _TEXT	
-  MessageCheck . . . . . . . . .	L Near	 00000185 _TEXT	
-  AccelTrue  . . . . . . . . . .	L Near	 00000194 _TEXT	
-  Exit_Program . . . . . . . . .	L Near	 0000019F _TEXT	
-WinProc  . . . . . . . . . . . .	P Near	 00000268 _TEXT	Length= 000000D7 Public STDCALL
+  MessageCheck . . . . . . . . .	L Near	 00000194 _TEXT	
+  AccelTrue  . . . . . . . . . .	L Near	 000001A3 _TEXT	
+  Exit_Program . . . . . . . . .	L Near	 000001AE _TEXT	
+WinProc  . . . . . . . . . . . .	P Near	 000002BB _TEXT	Length= 000000D7 Public STDCALL
   hWnd . . . . . . . . . . . . .	DWord	 bp + 00000008
   localMsg . . . . . . . . . . .	DWord	 bp + 0000000C
   wParam . . . . . . . . . . . .	DWord	 bp + 00000010
   lParam . . . . . . . . . . . .	DWord	 bp + 00000014
-  UpKey  . . . . . . . . . . . .	L Near	 000002F1 _TEXT	
-  endUp  . . . . . . . . . . . .	L Near	 000002FB _TEXT	
-  DownKey  . . . . . . . . . . .	L Near	 000002FD _TEXT	
-  LeftKey  . . . . . . . . . . .	L Near	 00000309 _TEXT	
-  RightKey . . . . . . . . . . .	L Near	 00000312 _TEXT	
-  SpaceKey . . . . . . . . . . .	L Near	 0000031B _TEXT	
-  Default  . . . . . . . . . . .	L Near	 00000324 _TEXT	
-  keydownExit  . . . . . . . . .	L Near	 00000324 _TEXT	
-  WinProcExit  . . . . . . . . .	L Near	 0000033B _TEXT	
+  UpKey  . . . . . . . . . . . .	L Near	 00000344 _TEXT	
+  endUp  . . . . . . . . . . . .	L Near	 0000034E _TEXT	
+  DownKey  . . . . . . . . . . .	L Near	 00000350 _TEXT	
+  LeftKey  . . . . . . . . . . .	L Near	 0000035C _TEXT	
+  RightKey . . . . . . . . . . .	L Near	 00000365 _TEXT	
+  SpaceKey . . . . . . . . . . .	L Near	 0000036E _TEXT	
+  Default  . . . . . . . . . . .	L Near	 00000377 _TEXT	
+  keydownExit  . . . . . . . . .	L Near	 00000377 _TEXT	
+  WinProcExit  . . . . . . . . .	L Near	 0000038E _TEXT	
 WriteBinB  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteBin . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteChar  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -824,7 +857,7 @@ ENABLE_PROCESSED_OUTPUT  . . . .	Number	 00000001h
 ENABLE_WINDOW_INPUT  . . . . . .	Number	 00000008h   
 ENABLE_WRAP_AT_EOL_OUTPUT  . . .	Number	 00000002h   
 ENHANCED_KEY . . . . . . . . . .	Number	 00000100h   
-ErrorTitle . . . . . . . . . . .	Byte	 00000184 _DATA	
+ErrorTitle . . . . . . . . . . .	Byte	 00000190 _DATA	
 FALSE  . . . . . . . . . . . . .	Number	 00000000h   
 FILE_APPEND_DATA . . . . . . . .	Number	 00000004h   
 FILE_ATTRIBUTE_ARCHIVE . . . . .	Number	 00000020h   
@@ -918,7 +951,7 @@ MB_YESNOCANCEL . . . . . . . . .	Number	 00000003h
 MB_YESNO . . . . . . . . . . . .	Number	 00000004h   
 MENU_EVENT . . . . . . . . . . .	Number	 00000008h   
 MOUSE_EVENT  . . . . . . . . . .	Number	 00000002h   
-MainWin  . . . . . . . . . . . .	WNDCLASS  000001A8 _DATA	
+MainWin  . . . . . . . . . . . .	WNDCLASS  000001B4 _DATA	
 MessageBox . . . . . . . . . . .	Text   	 MessageBoxA
 NULL . . . . . . . . . . . . . .	Number	 00000000h   
 NUMLOCK_ON . . . . . . . . . . .	Number	 00000020h   
@@ -1035,21 +1068,23 @@ WS_OVERLAPPED  . . . . . . . . .	Number	 00000000h
 WS_SYSMENU . . . . . . . . . . .	Number	 00080000h   
 WS_THICKFRAME  . . . . . . . . .	Number	 00040000h   
 WS_VISIBLE . . . . . . . . . . .	Number	 10000000h   
-WindowName . . . . . . . . . . .	Byte	 0000018A _DATA	
+WindowName . . . . . . . . . . .	Byte	 00000196 _DATA	
 WriteConsoleOutputCharacter  . .	Text   	 WriteConsoleOutputCharacterA
 WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
-className  . . . . . . . . . . .	Byte	 00000196 _DATA	
+className  . . . . . . . . . . .	Byte	 000001A2 _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
+displayTimer . . . . . . . . . .	Byte	 00000184 _DATA	
 errorRoid  . . . . . . . . . . .	Byte	 0000001A _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
 gameOverMessage  . . . . . . . .	Byte	 000000A7 _DATA	
+gameTimer  . . . . . . . . . . .	DWord	 00000014 _DATA	
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
-hInstance  . . . . . . . . . . .	DWord	 00000200 _DATA	
-hMainWnd . . . . . . . . . . . .	DWord	 000001FC _DATA	
+hInstance  . . . . . . . . . . .	DWord	 0000020C _DATA	
+hMainWnd . . . . . . . . . . . .	DWord	 00000208 _DATA	
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
 lightCyan  . . . . . . . . . . .	Number	 0000000Bh   
 lightGray  . . . . . . . . . . .	Number	 00000007h   
@@ -1057,9 +1092,9 @@ lightGreen . . . . . . . . . . .	Number	 0000000Ah
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
-messageID  . . . . . . . . . . .	DWord	 00000208 _DATA	
-msg  . . . . . . . . . . . . . .	MSGStruct  000001D0 _DATA	
-pErrorMsg  . . . . . . . . . . .	DWord	 00000204 _DATA	
+messageID  . . . . . . . . . . .	DWord	 00000214 _DATA	
+msg  . . . . . . . . . . . . . .	MSGStruct  000001DC _DATA	
+pErrorMsg  . . . . . . . . . . .	DWord	 00000210 _DATA	
 pLives . . . . . . . . . . . . .	Byte	 00000166 _DATA	
 playerLives  . . . . . . . . . .	DWord	 00000055 _DATA	
 playerScore  . . . . . . . . . .	DWord	 00000051 _DATA	
@@ -1074,9 +1109,8 @@ shipLocY . . . . . . . . . . . .	DWord	 00000004 _DATA
 shipPlaceholder  . . . . . . . .	Byte	 00000018 _DATA	
 shotsFired . . . . . . . . . . .	DWord	 00000010 _DATA	
 shots  . . . . . . . . . . . . .	Byte	 00000117 _DATA	
-timer  . . . . . . . . . . . . .	DWord	 00000014 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
-winRect  . . . . . . . . . . . .	RECT	 000001EC _DATA	
+winRect  . . . . . . . . . . . .	RECT	 000001F8 _DATA	
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 xPos . . . . . . . . . . . . . .	Byte	 00000125 _DATA	
 yPos . . . . . . . . . . . . . .	Byte	 00000134 _DATA	
