@@ -1,0 +1,15 @@
+﻿Build started 4/9/2016 10:04:53 PM.
+     1>Project "E:\IUSE Spring 2016\CSCI-C335-18862\Assembly Project\ProjectErrorRoids\ErrorRoidsMain\ProjectErrorRoids.vcxproj" on node 2 (Rebuild target(s)).
+     1>_MASM:
+         Assembling errorRoids.asm...
+       ClCompile:
+         E:\Visual Studio\VC\bin\CL.exe /c /IE:\SDL2\include\ /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt errorRoids_graphics.cpp
+         errorRoids_graphics.cpp
+       Link:
+         E:\Visual Studio\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\IUSE Spring 2016\CSCI-C335-18862\Assembly Project\ProjectErrorRoids\ErrorRoidsMain\Debug\ProjectErrorRoids_debug.exe" /INCREMENTAL /NOLOGO /LIBPATH:E:\SDL2\lib /LIBPATH:E:\Irvine SDL2main.lib SDL2.lib SDL2_net.lib SDL2_ttf.lib SDL2_image.lib Irvine32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"E:\IUSE Spring 2016\CSCI-C335-18862\Assembly Project\ProjectErrorRoids\ErrorRoidsMain\Debug\ProjectErrorRoids_debug.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\IUSE Spring 2016\CSCI-C335-18862\Assembly Project\ProjectErrorRoids\ErrorRoidsMain\Debug\ProjectErrorRoids_debug.lib" /MACHINE:X86 /SAFESEH:NO Debug\errorRoids_graphics.obj
+         ProjectErrorRoids.vcxproj -> E:\IUSE Spring 2016\CSCI-C335-18862\Assembly Project\ProjectErrorRoids\ErrorRoidsMain\Debug\ProjectErrorRoids_debug.exe
+     1>Done Building Project "E:\IUSE Spring 2016\CSCI-C335-18862\Assembly Project\ProjectErrorRoids\ErrorRoidsMain\ProjectErrorRoids.vcxproj" (Rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.03
