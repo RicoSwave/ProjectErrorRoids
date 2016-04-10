@@ -1,4 +1,10 @@
-//* Ascii Art ErrorRoids! Logo here *//
+ _______                       ______       _     _      _ 
+(_______)                     (_____ \     (_)   | |    | |
+ _____    ____ ____ ___   ____ _____) )___  _  __| | ___| |
+|  ___)  / ___) ___) _ \ / ___)  __  // _ \| |/ _  |/___)_|
+| |_____| |  | |  | |_| | |   | |  \ \ |_| | ( (_| |___ |_ 
+|_______)_|  |_|   \___/|_|   |_|   |_\___/|_|\____(___/|_|
+                                                           
 
 ErrorRoids is an action game where you control a program debugger to destroy errors in your  
 program. The errors appear as large ErrorRoids which must be destroyed.  Be careful!   
@@ -12,6 +18,7 @@ Good Luck!
 
 =======Requirements=======
 Windows 32-bit
+SDL 2.0
 Keyboard
 Mouse
 Reflexes
