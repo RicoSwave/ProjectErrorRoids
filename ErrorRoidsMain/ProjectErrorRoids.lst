@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.00.23026.0	    03/30/16 00:07:16
+Microsoft (R) Macro Assembler Version 14.00.23026.0	    04/09/16 22:01:11
 errorRoids.asm						     Page 1 - 1
 
 
@@ -169,6 +169,8 @@ errorRoids.asm						     Page 1 - 1
 	   00000000
  00000208 00000000		hMainWnd  DWORD ?
  0000020C 00000000		hInstance DWORD ?
+
+				;WM_PAINT PROTO hwnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD
 
 				;=================== MACROS =========================
 
@@ -445,6 +447,7 @@ errorRoids.asm						     Page 1 - 1
 				; are forwarded to the default Windows message
 				; handler.
 				;-----------------------------------------------------
+
  000002BE  8B 45 0C			mov eax, localMsg
 
 					.IF eax == WM_LBUTTONDOWN		; mouse button?
@@ -499,7 +502,8 @@ errorRoids.asm						     Page 1 - 1
  00000377			       Default:
  00000377			      keydownExit:
  00000377  EB 15			 jmp WinProcExit
-
+					;.ELSEIF eax == WM_PAINT
+					;  jmp WinProcExit
 					.ELSE		; other message?
 					  INVOKE DefWindowProc, hWnd, localMsg, wParam, lParam
  0000038C  EB 00			  jmp WinProcExit
@@ -537,7 +541,7 @@ errorRoids.asm						     Page 1 - 1
  000003D9			ErrorHandler ENDP
 
 				END WinMain
-Microsoft (R) Macro Assembler Version 14.00.23026.0	    03/30/16 00:07:16
+Microsoft (R) Macro Assembler Version 14.00.23026.0	    04/09/16 22:01:11
 errorRoids.asm						     Symbols 2 - 1
 
 
@@ -837,7 +841,7 @@ Symbols:
 @stack . . . . . . . . . . . . .	Text   	 FLAT
 ALT_MASK . . . . . . . . . . . .	Number	 00000003h   
 CAPSLOCK_ON  . . . . . . . . . .	Number	 00000080h   
-COLOR_BACKGROUND . . . . . . . .	Number	 0000000Ch   
+COLOR_BACKGROUND . . . . . . . .	Number	 0000000Fh   
 COLOR_WINDOW . . . . . . . . . .	Number	 00000005h   
 CREATE_ALWAYS  . . . . . . . . .	Number	 00000002h   
 CREATE_NEW . . . . . . . . . . .	Number	 00000001h   

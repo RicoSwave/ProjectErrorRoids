@@ -131,7 +131,7 @@ FormatMessage   TEXTEQU <FormatMessageA>
 
 ; RegisterClass Constants (from Winuser.h)
 COLOR_WINDOW        = 5		; std window color
-COLOR_BACKGROUND    = 0Ch	; 2=blue F=gray
+COLOR_BACKGROUND    = 0Fh	; 2=blue F=gray
 IDI_APPLICATION     = 32512		; application icon
 IDC_ARROW           = 07f00h		; mouse cursor--arrow
 CW_USEDEFAULT       = 80000000h		; default window size & position
@@ -154,7 +154,7 @@ SW_SHOW             =     05h
 WM_CLOSE            =  0010h		; close window
 WM_CREATE           =  01h		; create window
 WM_LBUTTONDOWN      =  0201h		; left mouse button down
-WM_KEYDOWN          =  0100h            ; key down test
+WM_KEYDOWN          =  0100h            ; key down
 
 COMMENT @
 MB_ICONERROR           =  010h	; stop sign icon

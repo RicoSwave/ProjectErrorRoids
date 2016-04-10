@@ -63,6 +63,8 @@ winRect   RECT <>
 hMainWnd  DWORD ?
 hInstance DWORD ?
 
+;WM_PAINT PROTO hwnd:DWORD, uMsg:DWORD, wParam:DWORD, lParam:DWORD
+
 ;=================== MACROS =========================
 
 ;-----------------------------------------------------
@@ -276,6 +278,7 @@ WinProc PROC,
 ; are forwarded to the default Windows message
 ; handler.
 ;-----------------------------------------------------
+
 	mov eax, localMsg
 
 	.IF eax == WM_LBUTTONDOWN		; mouse button?
@@ -325,7 +328,8 @@ WinProc PROC,
        Default:
       keydownExit:
 	 jmp WinProcExit
-
+	;.ELSEIF eax == WM_PAINT
+	;  jmp WinProcExit
 	.ELSE		; other message?
 	  INVOKE DefWindowProc, hWnd, localMsg, wParam, lParam
 	  jmp WinProcExit
