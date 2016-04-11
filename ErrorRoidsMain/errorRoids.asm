@@ -9,6 +9,10 @@ INCLUDE GraphWin.inc
 ;==================== DATA =======================
 .data
 ; Playfield values
+LOWXBND EQU 0
+LOWYBND EQU 0
+UPXBND EQU 800
+UPYBND EQU 600
 shipLocX DWORD 50		; X coordinate of the ship
 shipLocY DWORD 50		; Y coordinate of the ship
 shipHeading DWORD 90	; Heading of the ship
@@ -108,6 +112,75 @@ Paint PROC,
 	ret
 Paint endP
 
+;-----------------------------------------------------
+checkX PROC
+; Check X is within window bounds, if not wrap on border
+;-----------------------------------------------------
+	pushf
+	cmp eax,LOWXBND  ; Check for leaving X lower bound
+	jle LowX
+	cmp eax,UPXBND   ; Check for leaving X upper bound
+	jae HighX
+	jmp FinXCheck
+
+	LowX:
+	mov eax,UPXBND   ; Wrap on X border
+	jmp FinXCheck
+
+	HighX:
+	mov eax,LOWXBND  ; Wrap on X border
+
+	FinXCheck:
+	popf
+	ret
+checkX endp
+
+;-----------------------------------------------------
+checkY PROC
+; Check Y is within window bounds, if not wrap on border
+;-----------------------------------------------------
+	pushf
+	cmp eax,LOWYBND  ; Check for leaving Y lower bound
+	jle LowY
+	cmp eax,UPYBND   ; Check for leaving Y upper bound
+	jae HighY
+	jmp FinYCheck
+
+	LowY:
+	mov eax,UPYBND   ; Wrap on Y border
+	jmp FinYCheck
+
+	HighY:
+	mov eax,LOWYBND  ; Wrap on Y border
+
+	FinYCheck:
+	popf
+	ret
+checkY endp
+
+;-----------------------------------------------------
+checkHeading PROC
+; Check H is within 0-360 degrees, if not translate rotation
+;-----------------------------------------------------
+	pushf
+	cmp eax,360     ; Check greater than 360 Degrees
+	jge OverH
+	cmp eax,0	    ; Check lower than 0 Degrees
+	jl UnderH
+	jmp FinHCheck
+
+	OverH:
+	sub eax,360		; Minus one rotation
+	jmp FinHCheck
+
+	UnderH:
+	add eax,360		; Plus one rotation
+
+    FinHCheck:
+     popf
+     ret
+checkHeading endp
+
 WinMain PROC
 ; Get a handle to the current process.
 	INVOKE GetModuleHandle, NULL
@@ -160,7 +233,6 @@ Main_Loop:
 	  jmp Exit_Program
 	.ENDIF
 
-
 	; TODO: Implement Draw Playfield, probably with a C callback program
 
 	; TODO: Implement Decrease object acceleration due to inertia
@@ -176,40 +248,35 @@ Main_Loop:
     ; TODO: bounds checking & wrapping for other objects
 
     ; Ship bounds checking
-    cmp shipLocX,0		; Check for leaving X lower bound
-    jae XinBoundA
-    mov shipLocX,500	; Wrap on X border
-    XinBoundA:
-
-    cmp shipLocX,500	; Check for leaving X upper bound
-    jle XinBoundB
-    mov shipLocX,0		; Wrap on X border
-    XinBoundB:
-
-    cmp shipLocY,0		; Check for leaving Y lower bound
-    jae YinBoundA
-    mov shipLocY,500	; Wrap on Y border
-    YinBoundA:
-
-    cmp shipLocY,500	; Check for leaving Y upper bound
-    jle YinBoundB
-    mov shipLocY,0		; Wrap on Y border
-    YinBoundB:
-
-    cmp shipHeading,360
-    jge OverH
-    cmp shipHeading,0
-    jl UnderH
-    OverH:
-    sub shipHeading,360
-    jmp MessageCheck
-    UnderH:
-    add shipHeading,360
-
+    push eax
+    mov eax,shipLocX
+    call checkX
+    mov shipLocX,eax
+    mov eax,shipLocY
+    call checkY
+    mov shipLocY,eax
+    mov eax,shipHeading
+    call checkHeading
+    mov shipHeading,eax
+    pop eax
+  
     ;-----/BOUNDS-----------------
 
      inc gameTimer;
+	push eax
+	push ebx
+	push edx
+	mov ebx,60
+	xor edx,edx
+	mov eax,gameTimer
+	div ebx
+	cmp edx,0
+	jne NotSecond
 	add playerScore,5
+	NotSecond:
+	pop edx
+	pop ebx
+	pop eax
 	nop
 	nop
 
