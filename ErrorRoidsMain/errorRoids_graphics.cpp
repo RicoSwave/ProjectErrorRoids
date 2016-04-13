@@ -5,22 +5,30 @@
 //Followed setup instructions for VS 2015 at
 //http://headerphile.com/sdl2/sdl2-part-0-setting-up-visual-studio-for-sdl2/
 //Generic include directory, full path .\SDL2\include\SDL2
-#include "SDL2\SDL.h"
+//#include <SDL2\SDL.h>
+#undef main
 #include "stdio.h"
 #include <iostream>
 #include "res_path.h"
+
+//E:\SDL2\include\;
+//E:\SDL2\lib;
+//SDL2main.lib;SDL2.lib;SDL2_net.lib;SDL2_ttf.lib;SDL2_image.lib;
+//extern "C" void WinProc();
 
 /*
 * Hello World methods for SDL 2.0 graphics
 */
 
-int main(int, char**) {
+int main(int) {
 
 	//First we need to start up SDL, and make sure it went ok
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
 		return 1;
 	}
+
+	//WinProc();
 
 	//Now create a window with title "Hello World" at 100, 100 on the screen with w:640 h:480 and show it
 	SDL_Window *win = SDL_CreateWindow("Hello World!", 100, 100, 640, 480, SDL_WINDOW_SHOWN);

@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.00.23026.0	    04/11/16 05:10:41
+Microsoft (R) Macro Assembler Version 14.00.23026.0	    04/12/16 23:15:38
 errorRoids.asm						     Page 1 - 1
 
 
@@ -29,6 +29,8 @@ errorRoids.asm						     Page 1 - 1
 			      C .NOLIST
 			      C .LIST
 			      C 
+
+				doPaint proto c
 
 				;==================== DATA =======================
  00000000			.data
@@ -341,6 +343,7 @@ errorRoids.asm						     Page 1 - 1
 					.ENDIF
 
 					; TODO: Implement Draw Playfield, probably with a C callback program
+					
 
 					; TODO: Implement Decrease object acceleration due to inertia
 
@@ -374,7 +377,7 @@ errorRoids.asm						     Page 1 - 1
  00000193  50				push eax
  00000194  53				push ebx
  00000195  52				push edx
- 00000196  BB 0000003C			mov ebx,60
+ 00000196  BB 00000064			mov ebx,100
  0000019B  33 D2			xor edx,edx
  0000019D  A1 00000014 R		mov eax,gameTimer
  000001A2  F7 F3			div ebx
@@ -596,7 +599,7 @@ errorRoids.asm						     Page 1 - 1
  000003F7			ErrorHandler ENDP
 
 				END WinMain
-Microsoft (R) Macro Assembler Version 14.00.23026.0	    04/11/16 05:10:41
+Microsoft (R) Macro Assembler Version 14.00.23026.0	    04/12/16 23:15:38
 errorRoids.asm						     Symbols 2 - 1
 
 
@@ -883,6 +886,7 @@ checkY . . . . . . . . . . . . .	P Near	 0000003E _TEXT	Length= 0000001F Public 
   LowY . . . . . . . . . . . . .	L Near	 0000004E _TEXT	
   HighY  . . . . . . . . . . . .	L Near	 00000055 _TEXT	
   FinYCheck  . . . . . . . . . .	L Near	 0000005A _TEXT	
+doPaint  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C

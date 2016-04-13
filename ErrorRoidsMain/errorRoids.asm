@@ -6,6 +6,8 @@
 INCLUDE Irvine32.inc
 INCLUDE GraphWin.inc
 
+doPaint proto c		; stdcall proto
+
 ;==================== DATA =======================
 .data
 ; Playfield values
@@ -234,6 +236,7 @@ Main_Loop:
 	.ENDIF
 
 	; TODO: Implement Draw Playfield, probably with a C callback program
+	
 
 	; TODO: Implement Decrease object acceleration due to inertia
 
@@ -266,7 +269,7 @@ Main_Loop:
 	push eax
 	push ebx
 	push edx
-	mov ebx,60
+	mov ebx,100
 	xor edx,edx
 	mov eax,gameTimer
 	div ebx

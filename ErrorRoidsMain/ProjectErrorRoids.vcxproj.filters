@@ -20,7 +20,7 @@
     </MASM>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="errorRoids_graphics.cpp">
+    <ClCompile Include="painthandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
